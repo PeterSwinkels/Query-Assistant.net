@@ -117,8 +117,9 @@ Public Module QaModule
    Private Const WAARDE_TEKEN As Char = "="c                          'Scheidt de naam en waarde van een instellingenparameter van elkaar.
 
    Public ReadOnly BATCH_MODUS_ACTIEF As Func(Of Boolean) = Function() Not (Instellingen().BatchBereik = Nothing OrElse Instellingen().BatchQueryPad = Nothing)                                                                                                    'Geeft aan of de  batchmodus actief is.
+   Public ReadOnly BITS_MODUS As String = $"{If(Is64BitProcess, "64", "32")}-bits"                                                                                                                                                                                 'Geeft de bits modus voor dit programma op. (32-bits of 64-bits).
    Public ReadOnly OPDRACHT_REGEL As String = String.Join(" "c, GetCommandLineArgs.Skip(1))                                                                                                                                                                        'Bevat de eventuele opdrachtregel parameters.
-   Public ReadOnly PROGRAMMA_VERSIE As String = $"v{My.Application.Info.Version} ({If(Is64BitProcess, "64", "32")}bits)"                                                                                                                                           'Bevat programma versie informatie.
+   Public ReadOnly PROGRAMMA_VERSIE As String = $"v{My.Application.Info.Version} ({BITS_MODUS})"                                                                                                                                                                   'Bevat programma versie informatie.
    Public ReadOnly TOON_VERBINDINGS_STATUS As Action = Sub() ToonStatus(String.Format(If(VERBINDING_GEOPEND(Verbinding), "Verbonden met de database. - Instellingen: {0}{1}", "Er is geen verbinding met een database.{0}{1}"), Instellingen().Bestand, NewLine))  'Deze procedure toont de verbindingsstatus.
    Public ReadOnly VERBINDING_GEOPEND As Func(Of Connection, Boolean) = Function(VerbindingO As Connection) If(VerbindingO IsNot Nothing, VerbindingO.State = ObjectStateEnum.adStateOpen, False)                                                                  'Deze procedure geeft aan of de opgegeven verbinding geopend is.
    Private ReadOnly INTERACTIEVE_BATCH_PARAMETERS As New List(Of String)                                                                                                                                                                                           'Bevat de interactieve batch parameters.
@@ -425,7 +426,7 @@ Public Module QaModule
          If TypePad IsNot Nothing AndAlso Pad IsNot Nothing Then Bericht.Append($"{NewLine}{TypePad}""{Path.GetFullPath(Pad)}""")
          If ExtraInformatie IsNot Nothing Then Bericht.Append($"{NewLine}{ExtraInformatie}")
 
-         Keuze = MessageBox.Show(Bericht.ToString(), My.Application.Info.Title, MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2)
+         Keuze = MessageBox.Show(Bericht.ToString(), $"{My.Application.Info.Title} ({BITS_MODUS})", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2)
 
          Return Keuze
       Catch
@@ -641,7 +642,7 @@ Public Module QaModule
 
          If Not VerbindingsInformatie.Trim() = Nothing Then
             ParameterBegin = Positie
-            If Not VerbindingsInformatie.Trim().EndsWith(VERBINDING_PARAMETER_TEKEN) Then VerbindingsInformatie.Append(VERBINDING_PARAMETER_TEKEN)
+            If Not VerbindingsInformatie.Trim().EndsWith(VERBINDING_PARAMETER_TEKEN) Then VerbindingsInformatie = $"{VerbindingsInformatie}{VERBINDING_PARAMETER_TEKEN}"
 
             Do Until Positie >= VerbindingsInformatie.Length
                Teken = VerbindingsInformatie.Chars(Positie)

@@ -72,7 +72,7 @@ Public Class InterfaceVenster
             ResultaatExporterenKnop.Enabled = False
             ToonStatus($"Bezig met het exporteren van het queryresultaat...{NewLine}")
 
-            ExportPad = Path.GetFullPath(VerwijderAanhalingsTekens(VervangSymbolen(ExportPad).Trim()))
+            ExportPad = Path.GetFullPath((VervangSymbolen(ExportPad).Trim()).Trim(""""c))
 
             If Directory.Exists(Path.GetDirectoryName(ExportPad)) Then
                If ExporteerResultaat(ExportPad) Then
@@ -436,7 +436,7 @@ Public Class InterfaceVenster
             ToonStatus($"Query: ""{Query().Pad}""{NewLine}")
          End If
 
-         QueryPadVeld.Text = VerwijderAanhalingsTekens(Query().Pad)
+         QueryPadVeld.Text = Query().Pad.Trim(""""c)
          QueryPadVeld.SelectionStart = 0
          If Not QueryPadVeld.Text = Nothing Then QueryPadVeld.SelectionStart = QueryPadVeld.Text.Length - 1
       Catch
@@ -615,7 +615,7 @@ Public Class InterfaceVenster
    'Deze procedure geeft de opdracht het opgegeven/eerder geladen querybestand te tonen.
    Private Sub ToonQuery(Optional Pad As String = Nothing)
       Try
-         If Not BATCH_MODUS_ACTIEF() Then QueryParameters(If(Pad = Nothing, Query().Code, Query(VerwijderAanhalingsTekens(Pad)).Code))
+         If Not BATCH_MODUS_ACTIEF() Then QueryParameters(If(Pad = Nothing, Query().Code, Query(Pad.Trim(""""c)).Code))
 
          QueryResultaten(, ResultatenVerwijderen:=True)
          ResetVenster()

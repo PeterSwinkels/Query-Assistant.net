@@ -709,7 +709,7 @@ Public Module QaModule
          With OpdrachtRegelParameters(OPDRACHT_REGEL)
             If .Verwerkt Then
                If .InstellingenPad.Trim().StartsWith(PARAMETER_TEKEN) Then
-                  InstellingenPad = VerwijderAanhalingsTekens(.InstellingenPad.Trim().Substring(0, PARAMETER_TEKEN.ToString().Length + 1))
+                  InstellingenPad = .InstellingenPad.Trim().Substring(0, PARAMETER_TEKEN.ToString().Length + 1).Trim(""""c)
                   If InstellingenPad = Nothing Then
                      MessageBox.Show("Kan de instellingen niet bewaren. Geen doel bestand opgegeven.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                   Else
@@ -792,7 +792,7 @@ Public Module QaModule
                Else
                   For Each Parameter As String In SessieParameters.Split(PARAMETER_TEKEN)
                      If Not Parameter.Trim() = Nothing Then
-                        Parameter = VerwijderAanhalingsTekens(Parameter)
+                        Parameter = Parameter.Trim(""""c)
                         Extensie = Path.GetExtension(Parameter).ToLower()
 
                         If Not Extensies.Contains(Extensie) Then
@@ -1401,7 +1401,7 @@ Public Module QaModule
                Case "interactief"
                   .BatchInteractief = Boolean.Parse(Waarde)
                Case "querypad"
-                  .BatchQueryPad = Waarde
+                  .BatchQueryPad = Waarde.Trim(""""c)
                Case Else
                   If InstellingenFout(New StringBuilder("Niet herkende parameter."), BatchInstellingen.Bestand, Sectie, Regel) = DialogResult.Cancel Then Verwerkt = False
             End Select
@@ -1615,22 +1615,6 @@ Public Module QaModule
       Return Nothing
    End Function
 
-   'Deze procedure verwijdert eventuele aanhalingstekens aan het begin en/of eind van het opgegeven pad.
-   Public Function VerwijderAanhalingsTekens(Pad As String) As String
-      Try
-         Dim PadZonderAanhalingsTekens As String = Pad
-
-         If PadZonderAanhalingsTekens.StartsWith(""""c) Then PadZonderAanhalingsTekens = PadZonderAanhalingsTekens.Remove(0, 1)
-         If PadZonderAanhalingsTekens.EndsWith(""""c) Then PadZonderAanhalingsTekens = PadZonderAanhalingsTekens.Remove(PadZonderAanhalingsTekens.Length - 1, 1)
-
-         Return PadZonderAanhalingsTekens
-      Catch
-         HandelFoutAf()
-      End Try
-
-      Return Nothing
-   End Function
-
    'Deze procecure verwijdert eventuele opmaak uit de opgegeven querycode.
    Private Function VerwijderOpmaak(QueryCode As String, CommentaarBegin As String, CommentaarEinde As String, TekenreeksTekens As String) As String
       Try
@@ -1719,7 +1703,7 @@ Public Module QaModule
 
                If EersteQuery.ToString() = .BatchBereik.Substring(0, Positie).Trim() AndAlso LaatsteQuery.ToString() = .BatchBereik.Substring(Positie + 1).Trim() AndAlso EersteQuery <= LaatsteQuery Then
                   For QueryIndex As Integer = EersteQuery To LaatsteQuery
-                     QueryPad = VerwijderAanhalingsTekens($"{ .BatchQueryPad.Substring(0, .BatchQueryPad.Length - QueryPadExtensie.Length)}{QueryIndex}{QueryPadExtensie}")
+                     QueryPad = $"{ .BatchQueryPad.Substring(0, .BatchQueryPad.Length - QueryPadExtensie.Length)}{QueryIndex}{QueryPadExtensie}".Trim(""""c)
 
                      If Query(QueryPad).Geopend Then
                         QueryParameters(Query().Code)
@@ -1768,7 +1752,7 @@ Public Module QaModule
                                  ToonStatus($"{StatusNaQuery(ResultaatIndex:=0)}{NewLine}")
                                  If Not .ExportStandaardPad = Nothing Then
                                     ToonStatus($"Bezig met het exporteren van het queryresultaat...{NewLine}")
-                                    ExportPad = Path.GetFullPath(VerwijderAanhalingsTekens(VervangSymbolen(.ExportStandaardPad.Trim())))
+                                    ExportPad = Path.GetFullPath(VervangSymbolen(.ExportStandaardPad.Trim()).Trim(""""c))
 
                                     If Directory.Exists(Path.GetDirectoryName(ExportPad)) Then
                                        ExportPaden.Add(ExportPad)

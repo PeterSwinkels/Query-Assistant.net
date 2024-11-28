@@ -642,7 +642,7 @@ Public Class InterfaceVenster
       End Try
    End Sub
 
-   'Deze procedure stuurt een lijst van parameter veld houder objecten waarvan de naam zoals opgegeven begint terug.
+   'Deze procedure stuurt een lijst van parameterveld houder objecten waarvan de naam zoals opgegeven begint terug.
    Private Function VraagParameterVeldHouderObjectenOp(Naam As String) As List(Of Object)
       Try
          Return New List(Of Object)(From VensterObject In Me.ParameterVeldHouder.Controls Where DirectCast(VensterObject, Control).Name.StartsWith(Naam))
